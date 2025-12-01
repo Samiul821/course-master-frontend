@@ -5,11 +5,11 @@ import Footer from "../Pages/Shared/Footer/Footer";
 
 const RootLayout = () => {
   return (
-    <div className="px-[3%] lg:px-[10%]">
+    <div className="">
       <header>
         <Navbar></Navbar>
       </header>
-      <main className={`min-h-[calc(100vh-150px)] `}>
+      <main className={`min-h-[calc(100vh-150px)] px-[3%] lg:px-[10%]`}>
         <Outlet></Outlet>
       </main>
       <footer>
