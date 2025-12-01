@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { FaGoogle } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -6,6 +7,16 @@ import { BiBookAlt } from "react-icons/bi";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log("SignIn Data:", data);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -28,19 +39,17 @@ const SignIn = () => {
     initial: { scale: 1, borderColor: "#e5e7eb" },
     focus: { scale: 1.01, transition: { duration: 0.2 } },
   };
-
   const labelVariants = {
     initial: { y: 0, opacity: 1 },
     focus: { y: -2, opacity: 1, transition: { duration: 0.2 } },
   };
-
   const buttonHoverVariants = {
     hover: { scale: 1.02, transition: { duration: 0.2 } },
     tap: { scale: 0.98 },
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
       <motion.div
         className="w-full max-w-md"
         variants={containerVariants}
@@ -49,20 +58,23 @@ const SignIn = () => {
       >
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-8">
+          {" "}
           <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
-            <BiBookAlt
-              size={28}
-              className="text-green-600 group-hover:text-green-700 transition-colors"
-            />
-            CourseMaster
-          </h1>
+            {" "}
+            <BiBookAlt size={28} className="text-green-600 transition-colors" />
+            CourseMaster{" "}
+          </h1>{" "}
           <p className="text-gray-600 text-sm">
-            Create your account and start learning today
+            Sign in to your account and start learning today
           </p>
         </motion.div>
 
-        {/* Login Form */}
-        <motion.form variants={itemVariants} className="space-y-4">
+        {/* SignIn Form */}
+        <motion.form
+          variants={itemVariants}
+          className="space-y-4"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           {/* Email */}
           <motion.div variants={itemVariants}>
             <motion.label
@@ -78,8 +90,16 @@ const SignIn = () => {
               placeholder="you@example.com"
               variants={inputVariants}
               whileFocus="focus"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-400"
+              className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-gray-900 placeholder-gray-400 ${
+                errors.email ? "border-red-500" : "border-gray-200"
+              }`}
+              {...register("email", { required: "Email is required" })}
             />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </motion.div>
 
           {/* Password */}
@@ -98,7 +118,16 @@ const SignIn = () => {
                 placeholder="••••••••"
                 variants={inputVariants}
                 whileFocus="focus"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-400 pr-10"
+                className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-gray-900 placeholder-gray-400 pr-10 ${
+                  errors.password ? "border-red-500" : "border-gray-200"
+                }`}
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
+                  },
+                })}
               />
               <button
                 type="button"
@@ -112,6 +141,11 @@ const SignIn = () => {
                 )}
               </button>
             </div>
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.password.message}
+              </p>
+            )}
           </motion.div>
 
           {/* Forgot Password Link */}
@@ -129,7 +163,7 @@ const SignIn = () => {
             variants={buttonHoverVariants}
             whileHover="hover"
             whileTap="tap"
-            type="button"
+            type="submit"
             className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
           >
             Sign In
@@ -153,8 +187,8 @@ const SignIn = () => {
             type="button"
             className="w-full bg-white border-2 border-green-600 text-gray-900 font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg hover:bg-green-50 transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
           >
-            <FaGoogle className="text-green-600" size={18} />
-            <span>Sign in with Google</span>
+            <FaGoogle className="text-green-600" size={18} /> Sign in with
+            Google
           </motion.button>
         </motion.form>
 
