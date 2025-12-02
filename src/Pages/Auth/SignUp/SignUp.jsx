@@ -12,11 +12,13 @@ import SignUpLottie from "../../../../public/signup.json";
 import useAxios from "../../../Hooks/useAxios";
 import useAuth from "../../../Hooks/useAuth";
 import { useNavigate } from "react-router";
+import axios from "axios";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
   const axiosInstance = useAxios();
@@ -31,84 +33,89 @@ const SignUp = () => {
   } = useForm();
 
   // Image Preview
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setImagePreview(URL.createObjectURL(file));
+
+    setUploading(true);
+    setImagePreview(URL.createObjectURL(file)); // preview
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const url = `https://api.imgbb.com/1/upload?key=${
+        import.meta.env.VITE_IMAGEBB_KEY
+      }`;
+
+      const res = await axios.post(url, formData);
+
+      const hostedURL = res.data.data.url;
+      setImageFile(hostedURL); // final hosted url (correct)
+
+      console.log("Uploaded Image URL:", hostedURL);
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Image Upload Failed",
+        text: "Please try again.",
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
-    try {
-      setUploading(true);
-      let imageURL = "";
+    if (!imageFile) {
+      Swal.fire({
+        icon: "warning",
+        title: "Upload your profile image!",
+        confirmButtonColor: "#22c55e",
+      });
+      return;
+    }
 
-      // Upload to imgbb
-      const imageFile = data.profileImage[0];
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append("image", imageFile);
+    createUser(data.email, data.password)
+      .then(async (result) => {
+        const user = result.user;
 
-        const uploadRes = await fetch(
-          `https://api.imgbb.com/1/upload?key=${
-            import.meta.env.VITE_IMAGEBB_KEY
-          }`,
-          { method: "POST", body: formData }
+        const userInfo = {
+          fullname: data.fullName,
+          email: data.email,
+          password: data.password,
+          phone: data.phone,
+          dob: data.dob,
+          gender: data.gender,
+          profileImage: imageFile, // hosted url
+        };
+
+        const response = await axiosInstance.post("/users", userInfo);
+        console.log(response.data);
+
+        updateUser({ displayName: data.fullName, photoURL: imageFile }).then(
+          () => {
+            setUser({
+              ...user,
+              displayName: data.fullName,
+              photoURL: imageFile,
+            });
+            navigate("/");
+          }
         );
 
-        const uploadData = await uploadRes.json();
-        imageURL = uploadData.data.url;
-      }
-
-      // After creating the user
-      const userCredential = await createUser(data.email, data.password);
-      const currentUser = userCredential.user;
-
-      // Update Firebase Profile
-      await updateUser(currentUser, {
-        displayName: data.fullName,
-        photoURL: imageURL,
-        phoneNumber: data.phone,
+        Swal.fire({
+          icon: "success",
+          title: "Registration Successful!",
+        });
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: error.message,
+        });
       });
-
-      setUser(userCredential.user);
-
-      // Save user to DB
-      await axiosInstance.post("/users/register", {
-        fullname: data.fullName, // match backend
-        email: data.email,
-        password: data.password, // include password if needed
-        phone: data.phone,
-        dob: data.dob,
-        gender: data.gender,
-        profileImage: imageURL, // match backend
-      });
-
-      setUploading(false);
-
-      // SweetAlert Success Message
-      Swal.fire({
-        icon: "success",
-        title: "Registration Successful!",
-        text: `Welcome ${data.fullName}, your account has been created successfully.`,
-        showConfirmButton: true,
-        confirmButtonColor: "#22c55e", // green
-        timer: 3000,
-      });
-
-      navigate("/"); // Redirect after success
-    } catch (err) {
-      console.error(err);
-      setUploading(false);
-
-      // Optional: SweetAlert Error
-      Swal.fire({
-        icon: "error",
-        title: "Registration Failed",
-        text: err.message || "Something went wrong, please try again.",
-        confirmButtonColor: "#ef4444", // red
-      });
-    }
   };
 
   // Motion Variants
@@ -210,9 +217,9 @@ const SignUp = () => {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  {...register("profileImage")}
                   onChange={handleImageChange}
                 />
+
                 <span className="absolute -bottom-2 right-0 text-xs bg-green-600 text-white px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                   Click to upload
                 </span>
@@ -423,13 +430,10 @@ const SignUp = () => {
 
             {/* Register Button */}
             <motion.button
-              variants={buttonHoverVariants}
-              whileHover="hover"
-              whileTap="tap"
               type="submit"
               className="md:col-span-2 w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg"
             >
-              {uploading ? "Creating Account..." : "Register"}
+              {uploading ? "Uploading Image..." : "Register"}
             </motion.button>
 
             {/* Divider */}
