@@ -75,11 +75,9 @@ const SignUp = () => {
       });
       return;
     }
-
     createUser(data.email, data.password)
       .then(async (result) => {
         const user = result.user;
-
         const userInfo = {
           fullname: data.fullName,
           email: data.email,
@@ -87,12 +85,11 @@ const SignUp = () => {
           phone: data.phone,
           dob: data.dob,
           gender: data.gender,
-          profileImage: imageFile, // hosted url
+          profileImage: imageFile,
+          role: "student",
         };
-
         const response = await axiosInstance.post("/users", userInfo);
         console.log(response.data);
-
         updateUser({ displayName: data.fullName, photoURL: imageFile }).then(
           () => {
             setUser({
@@ -100,14 +97,15 @@ const SignUp = () => {
               displayName: data.fullName,
               photoURL: imageFile,
             });
-            navigate("/");
           }
         );
-
         Swal.fire({
           icon: "success",
-          title: "Registration Successful!",
+          title: `Welcome, ${data.fullName}!`,
+          text: `Your account has been created on Course Master. Let's start learning!`,
+          confirmButtonColor: "#22c55e",
         });
+        navigate("/");
       })
       .catch((error) => {
         Swal.fire({
