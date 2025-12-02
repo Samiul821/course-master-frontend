@@ -116,6 +116,44 @@ const SignUp = () => {
       });
   };
 
+  // Google SignIn Handler
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await googleSignIn(); 
+      const user = result.user;
+
+      // Prepare userInfo for backend
+      const userInfo = {
+        fullname: user.displayName || "Google User",
+        email: user.email,
+        profileImage: user.photoURL || "",
+        role: "student",
+      };
+
+      // Check if user exists in backend or create
+      await axiosInstance.post("/users", userInfo);
+
+      // Set context user
+      setUser(user);
+
+      Swal.fire({
+        icon: "success",
+        title: `Welcome, ${user.displayName || "Google User"}!`,
+        text: "You have logged in successfully using Google.",
+        confirmButtonColor: "#22c55e",
+      });
+
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Google SignIn Failed",
+        text: err.message,
+      });
+    }
+  };
+
   // Motion Variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -453,7 +491,7 @@ const SignUp = () => {
               whileTap="tap"
               type="button"
               className="md:col-span-2 w-full border-2 border-green-600 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium hover:bg-green-50 transition"
-              onClick={googleSignIn}
+              onClick={handleGoogleSignIn}
             >
               <FaGoogle className="text-green-600" />
               Continue with Google

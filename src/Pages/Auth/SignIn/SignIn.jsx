@@ -4,9 +4,16 @@ import { motion } from "framer-motion";
 import { FaGoogle } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { BiBookAlt } from "react-icons/bi";
+import useAuth from "../../../Hooks/useAuth";
+import useAxios from "../../../Hooks/useAxios";
+import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const { signIn, googleSignIn, setUser } = useAuth();
+  const axiosInstance = useAxios();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -14,8 +21,63 @@ const SignIn = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("SignIn Data:", data);
+  const onSubmit = async (data) => {
+    try {
+      const result = await signIn(data.email, data.password);
+      const user = result.user;
+
+      setUser(user);
+
+      Swal.fire({
+        icon: "success",
+        title: `Welcome back, ${user.displayName || "User"}!`,
+        confirmButtonColor: "#22c55e",
+      });
+
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "SignIn Failed",
+        text: err.message,
+      });
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await googleSignIn(); // Firebase Google SignIn
+      const user = result.user;
+
+      // Prepare backend user data
+      const userInfo = {
+        fullname: user.displayName || "Google User",
+        email: user.email,
+        profileImage: user.photoURL || "",
+        role: "student",
+      };
+
+      await axiosInstance.post("/users", userInfo);
+
+      setUser(user);
+
+      Swal.fire({
+        icon: "success",
+        title: `Welcome, ${user.displayName || "Google User"}!`,
+        text: "You have logged in successfully using Google.",
+        confirmButtonColor: "#22c55e",
+      });
+
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Google SignIn Failed",
+        text: err.message,
+      });
+    }
   };
 
   const containerVariants = {
@@ -39,10 +101,12 @@ const SignIn = () => {
     initial: { scale: 1, borderColor: "#e5e7eb" },
     focus: { scale: 1.01, transition: { duration: 0.2 } },
   };
+
   const labelVariants = {
     initial: { y: 0, opacity: 1 },
     focus: { y: -2, opacity: 1, transition: { duration: 0.2 } },
   };
+
   const buttonHoverVariants = {
     hover: { scale: 1.02, transition: { duration: 0.2 } },
     tap: { scale: 0.98 },
@@ -58,12 +122,10 @@ const SignIn = () => {
       >
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-8">
-          {" "}
           <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
-            {" "}
             <BiBookAlt size={28} className="text-green-600 transition-colors" />
-            CourseMaster{" "}
-          </h1>{" "}
+            CourseMaster
+          </h1>
           <p className="text-gray-600 text-sm">
             Sign in to your account and start learning today
           </p>
@@ -148,7 +210,7 @@ const SignIn = () => {
             )}
           </motion.div>
 
-          {/* Forgot Password Link */}
+          {/* Forgot Password */}
           <motion.div variants={itemVariants} className="text-right text-sm">
             <a
               href="/forgot-password"
@@ -179,13 +241,14 @@ const SignIn = () => {
             </div>
           </motion.div>
 
-          {/* Google Sign-In Button */}
+          {/* Google Sign-In */}
           <motion.button
             variants={buttonHoverVariants}
             whileHover="hover"
             whileTap="tap"
             type="button"
             className="w-full bg-white border-2 border-green-600 text-gray-900 font-semibold py-2.5 rounded-lg shadow-md hover:shadow-lg hover:bg-green-50 transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            onClick={handleGoogleSignIn}
           >
             <FaGoogle className="text-green-600" size={18} /> Sign in with
             Google
