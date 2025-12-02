@@ -42,6 +42,7 @@ const Navbar = () => {
       { to: "/", label: "Home" },
       { to: "/courses", label: "Courses" },
       { to: "/my-courses", label: "My Courses" },
+      { to: "/dashboard", label: "Student Dashboard" },
     ];
   } else if (role === "admin") {
     navItems = [
@@ -49,7 +50,7 @@ const Navbar = () => {
       { to: "/manage-courses", label: "Manage Courses" },
       { to: "/enrollments", label: "Enrollments" },
       { to: "/assignments", label: "Assignments" },
-      { to: "/admin-dashboard", label: "Admin Dashboard" },
+      { to: "/dashboard", label: "Admin Dashboard" },
     ];
   }
 
