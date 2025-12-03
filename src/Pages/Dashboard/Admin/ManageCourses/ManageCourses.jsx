@@ -134,14 +134,16 @@ const ManageCourses = () => {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleEdit(course._id)}
-                          className="p-2 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors"
-                        >
-                          <MdEdit className="w-5 h-5" />
-                        </motion.button>
+                        <Link to={`/dashboard//edit-courses/${course._id}`}>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleEdit(course._id)}
+                            className="p-2 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors"
+                          >
+                            <MdEdit className="w-5 h-5" />
+                          </motion.button>
+                        </Link>
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}

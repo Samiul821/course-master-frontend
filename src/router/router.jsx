@@ -10,6 +10,8 @@ import DashboardLayout from "../Layout/DashboardLayout";
 import DashboardHome from "../Pages/Dashboard/DashboardHome";
 import AddCourse from "../Pages/Dashboard/Admin/AddCourse/AddCourse";
 import AdminCourses from "../Pages/Dashboard/Admin/ManageCourses/ManageCourses";
+import AdminRoute from "../routes/AdminRoute";
+import EditCourses from "../Pages/Dashboard/Admin/EditCourses/EditCourses";
 
 const router = createBrowserRouter([
   // Root Layout
@@ -56,11 +58,27 @@ const router = createBrowserRouter([
       // Admin Route
       {
         path: "manage-courses",
-        Component: AdminCourses, // All Courses Page
+        element: (
+          <AdminRoute>
+            <AdminCourses />
+          </AdminRoute>
+        ), // All Courses Page
       },
       {
         path: "add-course",
-        Component: AddCourse, // Add New Course Page
+        element: (
+          <AdminRoute>
+            <AddCourse />
+          </AdminRoute>
+        ), // Add New Course Page
+      },
+      {
+        path: "edit-courses/:id",
+        element: (
+          <AdminRoute>
+            <EditCourses />
+          </AdminRoute>
+        ),
       },
       // {
       //   path: "/courses/edit/:id",
