@@ -24,12 +24,12 @@ const AuthProvider = ({ children }) => {
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
-  const updateUser = (user, userData) => {
-    if (!user) {
-      console.error("User object is undefined");
-      return;
+  const updateUser = (userData) => {
+    if (!auth.currentUser) {
+      console.error("No user is currently signed in");
+      return Promise.reject("No user signed in");
     }
-    return updateProfile(user, userData);
+    return updateProfile(auth.currentUser, userData);
   };
 
   //   Sign In

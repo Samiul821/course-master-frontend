@@ -75,51 +75,63 @@ const SignUp = () => {
       });
       return;
     }
-    createUser(data.email, data.password)
-      .then(async (result) => {
-        const user = result.user;
-        const userInfo = {
-          fullname: data.fullName,
-          email: data.email,
-          password: data.password,
-          phone: data.phone,
-          dob: data.dob,
-          gender: data.gender,
-          profileImage: imageFile,
-          role: "student",
-        };
-        const response = await axiosInstance.post("/users", userInfo);
-        console.log(response.data);
-        updateUser({ displayName: data.fullName, photoURL: imageFile }).then(
-          () => {
-            setUser({
-              ...user,
-              displayName: data.fullName,
-              photoURL: imageFile,
-            });
-          }
-        );
-        Swal.fire({
-          icon: "success",
-          title: `Welcome, ${data.fullName}!`,
-          text: `Your account has been created on Course Master. Let's start learning!`,
-          confirmButtonColor: "#22c55e",
-        });
-        navigate("/");
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          title: "Registration Failed",
-          text: error.message,
-        });
+
+    try {
+      // 1️⃣ Create user in Firebase
+      const result = await createUser(data.email, data.password);
+      const firebaseUser = result.user;
+
+      // 2️⃣ Update Firebase profile
+      await updateUser({
+        displayName: data.fullName,
+        photoURL: imageFile,
       });
+
+      // 3️⃣ Save user info in backend
+      const userInfo = {
+        fullname: data.fullName,
+        email: data.email,
+        password: data.password,
+        phone: data.phone,
+        dob: data.dob,
+        gender: data.gender,
+        profileImage: imageFile,
+        role: "student",
+      };
+      const response = await axiosInstance.post("/users", userInfo);
+      console.log("Backend response:", response.data);
+
+      // 4️⃣ Set user in context
+      setUser({
+        ...firebaseUser,
+        displayName: data.fullName,
+        photoURL: imageFile,
+      });
+
+      // 5️⃣ Show success message
+      Swal.fire({
+        icon: "success",
+        title: `Welcome, ${data.fullName}!`,
+        text: `Your account has been created on Course Master. Let's start learning!`,
+        confirmButtonColor: "#22c55e",
+      });
+
+      // 6️⃣ Navigate to home
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: error.message,
+      });
+    }
   };
 
   // Google SignIn Handler
   const handleGoogleSignIn = async () => {
     try {
-      const result = await googleSignIn(); 
+      const result = await googleSignIn();
       const user = result.user;
 
       // Prepare userInfo for backend

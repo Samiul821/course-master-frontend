@@ -9,6 +9,7 @@ import PrivateRoute from "../routes/PrivateRoute";
 import DashboardLayout from "../Layout/DashboardLayout";
 import DashboardHome from "../Pages/Dashboard/DashboardHome";
 import AddCourse from "../Pages/Dashboard/Admin/AddCourse/AddCourse";
+import AdminCourses from "../Pages/Dashboard/Admin/ManageCourses/ManageCourses";
 
 const router = createBrowserRouter([
   // Root Layout
@@ -53,10 +54,10 @@ const router = createBrowserRouter([
       },
 
       // Admin Route
-      // {
-      //   path: "/courses",
-      //   Component: AdminCourses, // All Courses Page
-      // },
+      {
+        path: "manage-courses",
+        Component: AdminCourses, // All Courses Page
+      },
       {
         path: "add-course",
         Component: AddCourse, // Add New Course Page
