@@ -106,7 +106,7 @@ const navItems = [
     id: "profile-admin",
     label: "Profile",
     icon: FaUserTie,
-    href: "/dashboard/admin-profile",
+    href: "/dashboard/adimn-profile",
     role: "admin",
   },
 ];
