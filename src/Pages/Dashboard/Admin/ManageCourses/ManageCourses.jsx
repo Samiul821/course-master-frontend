@@ -3,13 +3,16 @@ import { motion } from "framer-motion";
 import { MdAdd, MdEdit, MdDeleteOutline } from "react-icons/md";
 import { Link } from "react-router";
 import useAxios from "../../../../Hooks/useAxios";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 const PAGE_SIZE = 10;
 
 const ManageCourses = () => {
   const axiosInstance = useAxios();
   const [page, setPage] = useState(1);
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["courses", page],
@@ -26,8 +29,33 @@ const ManageCourses = () => {
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  const handleEdit = (id) => console.log("edit", id);
-  const handleDelete = (id) => console.log("delete", id);
+  // Delete course mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id) => axiosInstance.delete(`/courses/${id}`),
+    onSuccess: (response, id) => {
+      toast.success("Course has been deleted successfully!");
+      queryClient.invalidateQueries(["courses"]);
+    },
+    onError: () => {
+      toast.error("Failed to delete course.");
+    },
+  });
+
+  const handleDelete = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Course will be deleted permanently!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteMutation.mutate(id);
+      }
+    });
+  };
 
   return (
     <motion.div
@@ -262,7 +290,6 @@ const ManageCourses = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => handleEdit(course._id)}
                   className="flex-1 flex items-center justify-center gap-2 py-2 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 text-sm font-medium"
                 >
                   <MdEdit className="w-4 h-4" />
