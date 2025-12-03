@@ -12,6 +12,7 @@ import AddCourse from "../Pages/Dashboard/Admin/AddCourse/AddCourse";
 import AdminCourses from "../Pages/Dashboard/Admin/ManageCourses/ManageCourses";
 import AdminRoute from "../routes/AdminRoute";
 import EditCourses from "../Pages/Dashboard/Admin/EditCourses/EditCourses";
+import StudentList from "../Pages/Dashboard/Admin/StudentList/StudentList";
 
 const router = createBrowserRouter([
   // Root Layout
@@ -98,10 +99,12 @@ const router = createBrowserRouter([
       // },
 
       // // 5️⃣ Students
-      // {
-      //   path: "/students",
-      //   Component: StudentsList,
-      // },
+      {
+        path: "students",
+        element: <AdminRoute>
+          <StudentList></StudentList>
+        </AdminRoute>
+      },
 
       // // 6️⃣ Settings
       // // {

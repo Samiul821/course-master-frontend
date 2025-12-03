@@ -146,6 +146,7 @@ const AddCourse = () => {
         detailedDescription: data.detailedDescription || "",
         category: data.category || "",
         instructorName: data.instructorName || "",
+        instructorBio: data.instructorBio || "",
         courseDuration: Number(data.courseDuration) || 0,
         durationUnit: data.durationUnit || "weeks",
         courseLevel: data.courseLevel || "Beginner",
@@ -491,7 +492,7 @@ const AddCourse = () => {
                       <textarea
                         placeholder="Tell us about the instructor..."
                         rows={4}
-                        {...register("prerequisites")}
+                        {...register("instructorBio")}
                         className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100 resize-none"
                       />
                     </div>
