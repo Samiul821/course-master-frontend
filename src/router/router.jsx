@@ -8,6 +8,7 @@ import Signup from "../Pages/Auth/SignUp/SignUp";
 import PrivateRoute from "../routes/PrivateRoute";
 import DashboardLayout from "../Layout/DashboardLayout";
 import DashboardHome from "../Pages/Dashboard/DashboardHome";
+import AddCourse from "../Pages/Dashboard/Admin/AddCourse/AddCourse";
 
 const router = createBrowserRouter([
   // Root Layout
@@ -52,64 +53,64 @@ const router = createBrowserRouter([
       },
 
       // Admin Route
-      {
-        path: "/courses",
-        Component: AdminCourses, // All Courses Page
-      },
-      {
-        path: "/courses/add",
-        Component: AddCourse, // Add New Course Page
-      },
-      {
-        path: "/courses/edit/:id",
-        Component: EditCourse, // Course Edit Page
-      },
-
-      // 3️⃣ Enrollments
-      {
-        path: "/enrollments",
-        Component: EnrollmentsPage,
-      },
-
-      // 4️⃣ Assignment Review
-      {
-        path: "/assignments",
-        Component: AssignmentReview,
-      },
-
-      // 5️⃣ Students
-      {
-        path: "/students",
-        Component: StudentsList,
-      },
-
-      // 6️⃣ Settings
       // {
-      //   path: "/settings",
-      //   Component: AdminSettings,
+      //   path: "/courses",
+      //   Component: AdminCourses, // All Courses Page
       // },
       {
-        path: "/adimn-profile",
-        Component: AdminProfile,
+        path: "add-course",
+        Component: AddCourse, // Add New Course Page
       },
+      // {
+      //   path: "/courses/edit/:id",
+      //   Component: EditCourse, // Course Edit Page
+      // },
 
-      // Student Route
-      {
-        path: "/my-courses",
-        Component: StudentMyCourses,
-      },
-      {
-        path: "/learning/:courseId",
-        Component: LearningPage,
-      },
-      {
-        path: "/assignments",
-        Component: StudentAssignments,
-      },
-      {
-        path: "/my-profile",
-        Component: StuendProfile,
-      },
+      // // 3️⃣ Enrollments
+      // {
+      //   path: "/enrollments",
+      //   Component: EnrollmentsPage,
+      // },
+
+      // // 4️⃣ Assignment Review
+      // {
+      //   path: "/assignments",
+      //   Component: AssignmentReview,
+      // },
+
+      // // 5️⃣ Students
+      // {
+      //   path: "/students",
+      //   Component: StudentsList,
+      // },
+
+      // // 6️⃣ Settings
+      // // {
+      // //   path: "/settings",
+      // //   Component: AdminSettings,
+      // // },
+      // {
+      //   path: "/adimn-profile",
+      //   Component: AdminProfile,
+      // },
+
+      // // Student Route
+      // {
+      //   path: "/my-courses",
+      //   Component: StudentMyCourses,
+      // },
+      // {
+      //   path: "/learning/:courseId",
+      //   Component: LearningPage,
+      // },
+      // {
+      //   path: "/assignments",
+      //   Component: StudentAssignments,
+      // },
+      // {
+      //   path: "/my-profile",
+      //   Component: StuendProfile,
+      // },
     ],
   },
 ]);

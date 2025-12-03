@@ -6,12 +6,28 @@ import {
   AiOutlineSetting,
   AiOutlineLogout,
 } from "react-icons/ai";
-import { BiBookAlt, BiClipboard } from "react-icons/bi";
-import { MdDashboard } from "react-icons/md";
 import { GiGraduateCap } from "react-icons/gi";
-import { Link } from "react-router";
+import { FaUserTie } from "react-icons/fa";
+import { Link, NavLink, Outlet, useNavigate } from "react-router";
+import useAuth from "../Hooks/useAuth";
+import useUserRole from "../Hooks/useUserRole";
+import toast from "react-hot-toast";
 
+import {
+  MdDashboard,
+  MdSchool,
+  MdLibraryBooks,
+  MdAssignment,
+  MdManageAccounts,
+  MdPostAdd,
+  MdReviews,
+} from "react-icons/md";
+import { FaUserGraduate } from "react-icons/fa";
+
+// Nav items with unique icons
 const navItems = [
+  // COMMON NAV
+  { id: "home", label: "Home", icon: MdDashboard, href: "/", role: "all" },
   {
     id: "dashboard",
     label: "Dashboard",
@@ -19,72 +35,122 @@ const navItems = [
     href: "/dashboard",
     role: "all",
   },
+
+  // STUDENT NAV
   {
     id: "courses",
     label: "Courses",
-    icon: BiBookAlt,
-    href: "/courses",
-    role: "all",
+    icon: MdSchool,
+    href: "/dashboard/courses",
+    role: "student",
   },
   {
     id: "my-courses",
     label: "My Courses",
-    icon: BiClipboard,
-    href: "/my-courses",
+    icon: MdLibraryBooks,
+    href: "/dashboard/my-courses",
     role: "student",
   },
   {
+    id: "assignments",
+    label: "Assignments",
+    icon: MdAssignment,
+    href: "/dashboard/assignments",
+    role: "student",
+  },
+  {
+    id: "profile-student",
+    label: "Profile",
+    icon: AiOutlineSetting,
+    href: "/dashboard/profile",
+    role: "student",
+  },
+
+  // ADMIN NAV
+  {
     id: "manage-courses",
     label: "Manage Courses",
-    icon: BiBookAlt,
-    href: "/manage-courses",
+    icon: MdManageAccounts,
+    href: "/dashboard/manage-courses",
     role: "admin",
   },
   {
-    id: "settings",
-    label: "Settings",
-    icon: AiOutlineSetting,
-    href: "/settings",
-    role: "all",
+    id: "add-course",
+    label: "Add Course",
+    icon: MdPostAdd,
+    href: "/dashboard/add-course",
+    role: "admin",
+  },
+  {
+    id: "enrollments",
+    label: "Enrollments",
+    icon: FaUserGraduate,
+    href: "/dashboard/enrollments",
+    role: "admin",
+  },
+  {
+    id: "assignment-review",
+    label: "Assignments Review",
+    icon: MdReviews,
+    href: "/dashboard/assignments-review",
+    role: "admin",
+  },
+  {
+    id: "students",
+    label: "Students",
+    icon: MdLibraryBooks,
+    href: "/dashboard/students",
+    role: "admin",
+  },
+  {
+    id: "profile-admin",
+    label: "Profile",
+    icon: FaUserTie,
+    href: "/dashboard/admin-profile",
+    role: "admin",
   },
 ];
 
-export default function DashboardLayout({
-  children,
-  userRole = "student",
-  currentPath = "/dashboard",
-}) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+const DashboardLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { logOut } = useAuth();
+  const { role, roleLoading } = useUserRole();
+  const navigate = useNavigate();
+
+  if (roleLoading) return <p className="text-center mt-20">Loading...</p>;
 
   const filteredNavItems = navItems.filter(
-    (item) => item.role === "all" || item.role === userRole
+    (item) => item.role === "all" || item.role === role
   );
+
+  const handleLogout = async () => {
+    await logOut();
+    toast.success("Logged out successfully!");
+    navigate("/");
+  };
 
   const handleNavClick = () => setMobileMenuOpen(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile Menu Button */}
-      <Link to="/">
-        <div className="fixed top-0 left-0 right-0 z-40 lg:hidden bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <GiGraduateCap className="w-6 h-6 text-green-600" />
-            <span className="font-bold text-gray-900">CourseMaster</span>
-          </div>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? (
-              <AiOutlineClose className="w-6 h-6" />
-            ) : (
-              <AiOutlineMenu className="w-6 h-6" />
-            )}
-          </button>
-        </div>
-      </Link>
+      {/* Mobile top bar */}
+      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2">
+          <GiGraduateCap className="w-6 h-6 text-green-600" />
+          <span className="font-bold text-gray-900">CourseMaster</span>
+        </Link>
+
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          {mobileMenuOpen ? (
+            <AiOutlineClose className="w-6 h-6" />
+          ) : (
+            <AiOutlineMenu className="w-6 h-6" />
+          )}
+        </button>
+      </div>
 
       {/* Desktop Sidebar */}
       <motion.div
@@ -112,46 +178,34 @@ export default function DashboardLayout({
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-2">
-          {filteredNavItems.map((item, index) => {
+          {filteredNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = currentPath === item.href;
-
             return (
-              <motion.a
+              <NavLink
                 key={item.id}
-                href={item.href}
+                to={item.href}
                 onClick={handleNavClick}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ x: 4 }}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive
-                    ? "bg-green-50 text-green-600 shadow-md"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
+                end={item.href === "/dashboard"}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    isActive
+                      ? "bg-green-50 text-green-600 shadow-md"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`
+                }
               >
-                <Icon
-                  className={`w-5 h-5 flex-shrink-0 ${
-                    isActive ? "text-green-600" : "text-gray-400"
-                  }`}
-                />
+                <Icon className="w-5 h-5 text-gray-400" />
                 <span className="font-medium text-sm">{item.label}</span>
-                {item.role !== "all" && (
-                  <span className="ml-auto text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                    {item.role}
-                  </span>
-                )}
-              </motion.a>
+              </NavLink>
             );
           })}
         </nav>
 
-        {/* Logout */}
+        {/* Logout Desktop */}
         <div className="px-4 py-6 border-t border-gray-100">
           <motion.button
+            onClick={handleLogout}
             whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 bg-gray-50 hover:bg-green-50 hover:text-green-600 transition-all font-medium text-sm"
           >
             <AiOutlineLogout className="w-5 h-5" />
@@ -160,18 +214,16 @@ export default function DashboardLayout({
         </div>
       </motion.div>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar */}
       {mobileMenuOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           onClick={() => setMobileMenuOpen(false)}
-          className="fixed inset-0 z-30 lg:hidden backdrop-blur-xs bg-black/5"
+          className="fixed inset-0 z-30 lg:hidden backdrop-blur-sm bg-black/10"
         />
       )}
 
-      {/* Mobile Sidebar */}
       <motion.div
         initial={{ x: -280 }}
         animate={{ x: mobileMenuOpen ? 0 : -280 }}
@@ -179,39 +231,34 @@ export default function DashboardLayout({
         className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-72 bg-white border-r border-gray-100 z-40 lg:hidden flex flex-col overflow-y-auto"
       >
         <nav className="px-4 py-6 space-y-2">
-          {filteredNavItems.map((item, index) => {
+          {filteredNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = currentPath === item.href;
             return (
-              <motion.a
+              <NavLink
                 key={item.id}
-                href={item.href}
+                to={item.href}
                 onClick={handleNavClick}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: index * 0.05 }}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive
-                    ? "bg-green-50 text-green-600 shadow-md"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
+                end={item.href === "/dashboard"}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    isActive
+                      ? "bg-green-50 text-green-600 shadow-md"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`
+                }
               >
-                <Icon
-                  className={`w-5 h-5 flex-shrink-0 ${
-                    isActive ? "text-green-600" : "text-gray-400"
-                  }`}
-                />
+                <Icon className="w-5 h-5 text-gray-400" />
                 <span className="font-medium text-sm">{item.label}</span>
-              </motion.a>
+              </NavLink>
             );
           })}
         </nav>
 
-        {/* Logout Mobile */}
+        {/* Mobile Logout */}
         <div className="px-4 py-4 border-t border-gray-100 mt-auto">
           <motion.button
+            onClick={handleLogout}
             whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 bg-gray-50 hover:bg-green-50 hover:text-green-600 transition-all font-medium text-sm"
           >
             <AiOutlineLogout className="w-5 h-5" />
@@ -222,58 +269,10 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main className="lg:ml-72 pt-20 lg:pt-0 min-h-screen bg-white">
-        <div className="px-6 py-10 lg:py-10 max-w-7xl mx-auto">
-          {children || (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="space-y-8"
-            >
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  Welcome to CourseMaster
-                </h1>
-                <p className="text-gray-600">
-                  Your learning journey starts here. Explore courses and build
-                  your skills.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map((i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    whileHover={{ y: -4 }}
-                    className="bg-white border border-gray-100 rounded-lg p-6 hover:shadow-lg transition-shadow"
-                  >
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                      <BiBookAlt className="w-6 h-6 text-green-600" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      Course {i}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Master essential skills with our comprehensive course
-                      material.
-                    </p>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="text-green-600 font-medium text-sm hover:text-green-700 transition-colors"
-                    >
-                      View Course →
-                    </motion.button>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </div>
+        <Outlet />
       </main>
     </div>
   );
-}
+};
+
+export default DashboardLayout;
