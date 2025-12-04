@@ -14,6 +14,7 @@ import AdminRoute from "../routes/AdminRoute";
 import EditCourses from "../Pages/Dashboard/Admin/EditCourses/EditCourses";
 import StudentList from "../Pages/Dashboard/Admin/StudentList/StudentList";
 import AdminProfile from "../Pages/Dashboard/Admin/AdminProfile/AdminProfile";
+import ManageCourses from "../Pages/Admin/MangaeCourses/ManageCourses";
 
 const router = createBrowserRouter([
   // Root Layout
@@ -25,6 +26,13 @@ const router = createBrowserRouter([
         index: true,
         Component: Home,
       },
+      // Admin Route
+      {
+        path: "manage-courses",
+        element: <AdminRoute>
+           <ManageCourses />
+        </AdminRoute>
+      }
     ],
   },
   // Auth Layout
