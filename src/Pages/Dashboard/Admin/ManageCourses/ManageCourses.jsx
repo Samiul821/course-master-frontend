@@ -6,11 +6,13 @@ import useAxios from "../../../../Hooks/useAxios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
+// import useAxiosSecure from "../../../../Hooks/useAxiosSecure";
 
 const PAGE_SIZE = 10;
 
 const ManageCourses = () => {
   const axiosInstance = useAxios();
+  // const axiosSecure = useAxiosSecure()
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
 

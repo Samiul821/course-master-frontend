@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import useAxios from "../../../../Hooks/useAxios";
 import useAuth from "../../../../Hooks/useAuth";
+// import useAxiosSecure from "../../../../Hooks/useAxiosSecure"
 import { useForm, Controller } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +14,7 @@ import {
 } from "react-icons/md";
 import axios from "axios";
 import Swal from "sweetalert2";
+import useAxios from "../../../../Hooks/useAxios";
 
 const steps = [
   { id: 1, title: "Basic Info", description: "Course fundamentals" },
@@ -44,6 +45,7 @@ const EditCourses = () => {
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const { id } = useParams();
+  // const axiosSecure = useAxiosSecure()
   const axiosInstance = useAxios();
   const { user } = useAuth();
   const navigate = useNavigate();

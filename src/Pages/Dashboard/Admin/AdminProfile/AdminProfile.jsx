@@ -5,11 +5,12 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import useAxios from "../../../../Hooks/useAxios";
 import useAuth from "../../../../Hooks/useAuth";
+import useAxios from "../../../../Hooks/useAxios";
+// import useAxiosSecure from "../../../../Hooks/useAxiosSecure";
 
 const AdminProfile = () => {
-  const axiosInstance = useAxios();
+  const axiosInstance = useAxios()
   const queryClient = useQueryClient();
   const { user, updateUser } = useAuth();
 
@@ -113,7 +114,7 @@ const AdminProfile = () => {
       });
 
       // Update MongoDB
-      await axiosInstance.patch(`/users/update/${data.email}`, {
+      await axiosSecure.patch(`/users/update/${data.email}`, {
         fullName: data.fullName,
         phone: data.phone,
         dob: data.dob,
